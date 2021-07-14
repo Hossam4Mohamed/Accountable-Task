@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+  rabbitMQ:
+    image: rabbitmq:3-management
+    restart: on-failure
+    networks:
+      - accountable-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:15672']
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  database:
+    image: 'bitnami/mongodb:4.1.1'
+    restart: on-failure
+    networks:
+      - accountable-network
+    healthcheck:
+      test: ['CMD', 'mongo', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    ports:
+      - '27018:27017'
+    volumes:
+      - 'mongo-data:/bitnami'
+    environment:
+      - MONGODB_USERNAME=admin
+      - MONGODB_PASSWORD=P@ssw0rd
+      - MONGODB_DATABASE=accountable
+
+  bank-api:
+    build:
+      context: ./BankApi
+    restart: on-failure
+    ports:
+      - '4000:4000'
+    networks:
+      - accountable-network
+    healthcheck:
+      test: ['CMD', 'wget', '-O', '/dev/null', '-q', 'localhost:3000']
+      interval: 10s
+      timeout: 6s
+      retries: 5
+      start_period: 20s
+    environment:
+      PORT: 4000
+      SECRET_KEY: 'SECRET_KEY'
+      MAX_TRANSACTIONS_NUMBER: 10
+
+  worker:
+    build:
+      context: ./Worker
+    restart: always
+    networks:
+      - accountable-network
+    depends_on:
+      - rabbitMQ
+      - database
+      - bank-api
+    environment:
+      MONGO_URL: 'mongodb://database:27017/accountable'
+      AMQP_CONNECTION_URL: 'amqp://rabbitMQ:5672'
+      BASE_API_URL: 'http://middleware:3000'
+      BANK_API_URL: 'http://bank-api:4000'
+
+  middleware:
+    build:
+      context: ./BusinessLogic
+    restart: always
+    networks:
+      - accountable-network
+    depends_on:
+      - rabbitMQ
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      MONGO_URL: 'mongodb://database:27017/accountable'
+      AMQP_CONNECTION_URL: 'amqp://rabbitMQ:5672'
+      JWT_SECRET: JWT_SECRET
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  accountable-network:

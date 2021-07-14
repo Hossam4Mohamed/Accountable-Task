@@ -1,0 +1,1 @@
+export { amqpConfig } from './amqp';
