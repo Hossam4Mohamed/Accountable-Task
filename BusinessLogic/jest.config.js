@@ -10,4 +10,7 @@ module.exports = {
   collectCoverage: true,
   clearMocks: true,
   coverageDirectory: 'coverage',
+  moduleNameMapper: {
+    '^@/(.*)': '<rootDir>/src/$1'
+ }
 };
