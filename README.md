@@ -14,6 +14,8 @@
 
 - [Requirements](#requirements)
 
+- [Unit Testing](#unit-testing)
+
 - [Additional Resources](#additional-resources)
 
 ## Introduction
@@ -97,6 +99,14 @@ An internet connection of course :).
   - Bank API will run by default on port `4000`, and is accessible from `http://localhost:4000`
   - RabbitMQ Manage Interface will be accessible from `http://localhost:15672`
 
-### Additional Resources
+##Unit Testing
+
+It is only applied partially on **Business Logic** with testing framework called [jest](https://jestjs.io/) and it can be run using the following command :
+
+```bash
+$ npm run test
+```
+
+## Additional Resources
 
 - [Postman Collection Link: Local or Docker](https://www.getpostman.com/collections/7f7183970966924c9c6a)
