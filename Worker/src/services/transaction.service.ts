@@ -16,7 +16,6 @@ export async function fetchTransactions(
       intervalFetching: intervalFetching,
     },
   });
-  console.log({ response });
   return response.data;
 }
 

@@ -15,7 +15,7 @@ export async function appendUserToRequest(
 ): Promise<void> {
   const { authorization } = req.headers;
 
-  if (!authorization) next(UNAUTHORIZED_ERR);
+  if (!authorization) return next(UNAUTHORIZED_ERR);
 
   try {
     const payload = jwt.verify(
@@ -25,11 +25,11 @@ export async function appendUserToRequest(
 
     const { userId } = payload;
     const user = await UserModel.findById(userId);
-    if (!user) next(UNAUTHORIZED_ERR);
+    if (!user) return next(UNAUTHORIZED_ERR);
     req.user = user;
 
-    next();
+    return next();
   } catch (e) {
-    next(UNAUTHORIZED_ERR);
+    return next(UNAUTHORIZED_ERR);
   }
 }

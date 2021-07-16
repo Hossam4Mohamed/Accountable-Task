@@ -9,7 +9,7 @@ export async function isWorkerAuthorized(
 ): Promise<void> {
   const { api_key } = req.headers;
 
-  if (api_key !== process.env.WORKER_API_KEY) next(UNAUTHORIZED_ERR);
+  if (api_key !== process.env.WORKER_API_KEY) return next(UNAUTHORIZED_ERR);
 
-  next();
+  return next();
 }

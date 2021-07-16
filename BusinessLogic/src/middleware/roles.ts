@@ -13,7 +13,7 @@ export async function isAdmin(
     user: { role },
   } = req;
 
-  if (role !== 'ADMIN') next(UNAUTHORIZED_ERR);
+  if (role !== 'ADMIN') return next(UNAUTHORIZED_ERR);
 
-  next();
+  return next();
 }
